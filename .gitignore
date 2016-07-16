@@ -35,3 +35,7 @@ Servo.app
 
 # VSCode
 .vscode
+
+# rusty-tags
+*.vi
+Cargo.lock
