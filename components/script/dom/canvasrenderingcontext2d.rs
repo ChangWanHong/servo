@@ -45,6 +45,9 @@ use script_traits::ScriptMsg as ConstellationMsg;
 use std::cell::Cell;
 use std::str::FromStr;
 use std::{cmp, fmt};
+use style::parser::ParserContextExtraData;
+use style::properties::Shorthand;
+use style::properties::parse_one_declaration;
 use unpremultiplytable::UNPREMULTIPLY_TABLE;
 use url::Url;
 
@@ -86,6 +89,7 @@ struct CanvasContextState {
     shadow_offset_y: f64,
     shadow_blur: f64,
     shadow_color: RGBA,
+    font: DOMString,
 }
 
 impl CanvasContextState {
@@ -111,6 +115,7 @@ impl CanvasContextState {
             shadow_offset_y: 0.0,
             shadow_blur: 0.0,
             shadow_color: RGBA { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.0 }, // transparent black
+            font: DOMString::from("10px sans-serif"),
         }
     }
 }
@@ -1324,6 +1329,24 @@ impl CanvasRenderingContext2DMethods for CanvasRenderingContext2D {
                 .send(CanvasMsg::Canvas2d(Canvas2dMsg::SetShadowColor(color)))
                 .unwrap()
         }
+    }
+
+    // https://html.spec.whatwg.org/multipage/scripting.html#dom-context-2d-font
+    fn Font(&self) -> DOMString {
+        DOMString::from(self.state.borrow().font.clone())
+    }
+
+    // https://html.spec.whatwg.org/multipage/scripting.html#dom-context-2d-font
+    fn SetFont(&self, value: DOMString) {
+        let window = window_from_node(&*self.canvas);
+        let declarations =
+            parse_one_declaration("font", &value, &window.get_url(), window.css_error_reporter(),
+                                  ParserContextExtraData::default());
+
+        let shorthand = Shorthand::from_name("font").unwrap();
+        let serialized_value = shorthand.serialize_shorthand_value_to_string(declarations.unwrap().iter(), false);
+        // println!("{}", serialized_value);
+        self.state.borrow_mut().font = DOMString::from(serialized_value);
     }
 }
 

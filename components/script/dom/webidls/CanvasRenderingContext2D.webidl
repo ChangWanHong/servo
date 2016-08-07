@@ -223,7 +223,7 @@ interface CanvasPathDrawingStyles {
 [NoInterfaceObject, Exposed=(Window,Worker)]
 interface CanvasTextDrawingStyles {
   // text
-  //attribute DOMString font; // (default 10px sans-serif)
+  attribute DOMString font; // (default 10px sans-serif)
   //attribute CanvasTextAlign textAlign; // "start", "end", "left", "right", "center" (default: "start")
   //attribute CanvasTextBaseline textBaseline; // "top", "hanging", "middle", "alphabetic",
                                       // "ideographic", "bottom" (default: "alphabetic")
